@@ -85,7 +85,7 @@ Task 1 : Project Foundation completed.
 
 2. Error Handling: Express recognizes error-handling middleware through its four parameters: err, req, res, and next. It should be placed after the routes.
 
-3. app.js and server.js:** The app.js file handles Express configuration, middleware, and routes, while server.js starts the server and listens on a port. Keeping them separate makes testing easier.
+3. app.js and server.js: The app.js file handles Express configuration, middleware, and routes, while server.js starts the server and listens on a port. Keeping them separate makes testing easier.
 
 4. dotenv: Dotenv loads variables from the .env file into process.env. We do not commit .env because it may contain secrets. Instead, we commit .env.example as a reference.
 
