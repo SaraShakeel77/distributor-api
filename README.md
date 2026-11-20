@@ -1,115 +1,168 @@
 # Distributor Order Management API
 
-## Task 1 
+A RESTful API built with Node.js and Express.js for managing distributor operations.
 
-# About the Project
-This project is the starting point of a Distributor Order Management API. Task 1 focuses on setting up the Express application, organizing the project structure, and implementing basic middleware and error handling.
+## Technologies
 
-# Technologies Used
- Node.js
- Express.js
- JavaScript
- dotenv
- Nodemon
- ESLint
- Prettier
+- Node.js, Express.js, JavaScript
+- dotenv, Nodemon
+- Zod, ESLint, Prettier
 
+## Setup
 
-# How to Run the Project
-
-1. Clone the repository.
-2. Install dependencies:
-
-# bash
+bash
 npm install
 
-3. Create a .env file using .env.example as a reference.
 
-4. Start the development server:
-
-use command
+Create a `.env` file using `.env.example`, then run:
+bash
 npm run dev
 
 
-To start normally:
-npm start
+---
 
+# Task 1 – Project Foundation
 
-# API Endpoint
+## Implementation
 
-Method: GET
+- Set up Express application and project structure.
+- Separated `app.js` and `server.js`.
+- Configured dotenv and request logging.
+- Implemented 404 and centralized error handling.
+- Created a custom AppError class.
+- Configured development and formatting scripts.
 
-Endpoint: /health
+## API Endpoint
 
-Description: Checks if the API is running
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/health` | Check API status |
 
+Response:
 
-Example Response:
-
+```json
 {
   "status": "ok",
   "service": "distributor-api"
 }
+```
 
+## Bug Log
 
+1. Error Handler Position
 
-### What I Implemented
+- Symptom: Route errors were not caught.
+- Cause: Error handler was registered before routes.
+- Fix: Moved it below routes.
+- Lesson: Middleware order matters.
 
-. Set up the Express application and project structure.
-. Separated application setup (app.js) from server startup (server.js).
-. Configured environment variables using dotenv.
-. Implemented request logging with method, path, status code, and response time.
-. Added 404 handling for unknown routes.
-. Implemented centralized error handling.
-. Created a custom AppError class.
-. Configured development, production, linting, and formatting scripts.
+2. Missing .env
 
+- Symptom: Server used a default port.
+- Cause: Missing PORT variable was not checked.
+- Fix: Added startup validation.
+- Lesson: Validate required environment variables.
 
-### Design Decisions
+3. Async Route Error
 
-. Kept application setup and server startup separate.
-. Used dotenv for environment configuration.
-. Used centralized error handling to manage errors in one place.
-. Placed error-handling middleware after the routes.
+- Symptom: Async route errors needed verification.
+- Cause: Express 5 handles rejected promises automatically.
+- Fix: Verified errors reached the central handler.
+- Lesson: Understand framework behavior before adding unnecessary code.
 
+---
 
+# Task 2 – Customer API
 
-### Task 1 Status
+## Implementation
 
-Task 1 : Project Foundation completed.
+Implemented Customer CRUD operations using a layered architecture.
 
+- Routes and controllers
+- Service and repository layers
+- Zod request validation
+- Duplicate email prevention
+- Centralized error handling
+
+## API Endpoints
+
+Base URL: `http://localhost:5000/api/customers`
+
+| Method | Endpoint | Description |
+
+| POST | /api/customers | Create customer |
+| GET | /api/customers | Get all customers |
+| GET | /api/customers/:id | Get customer by ID |
+| PUT | /api/customers/:id | Update customer |
+| DELETE | /api/customers/:id | Delete customer |
+
+## Validation Rules
+
+- Name and company are required.
+- Email must be valid.
+- Phone is optional.
+- Status must match an allowed enum value.
+
+## Bug Log & Security Testing
+
+1. Invalid Customer Data
+
+- Symptom: Invalid names, empty bodies, and malformed JSON caused unexpected errors.
+- Cause: Missing or incomplete request validation.
+- Fix: Added Zod validation and JSON error handling.
+- Lesson: Validate input before processing.
+
+2. Duplicate Emails
+
+- Symptom: `A@x.com` and `a@x.com` could be treated differently.
+- Cause: Case-sensitive email comparison.
+- Fix: Normalize emails to lowercase; return `409 Conflict` for duplicates.
+- Lesson: Normalize data before uniqueness checks.
+
+3. Deleted Customer Retrieval
+
+- Symptom: Deleted customers could remain accessible.
+- Cause: Incomplete deletion or not-found handling.
+- Fix: Implemented repository deletion and missing-record handling.
+- Lesson: Deleted records should not be retrievable.
+
+4. Mass Assignment Vulnerability
+
+- Symptom: Extra fields such as `"role": "ADMIN"` could modify unauthorized properties.
+- Cause: Unrestricted assignment of request data.
+- Fix: Restrict updates to permitted customer fields.
+- Lesson: Never trust client-provided fields for sensitive properties.
+
+## Testing
+
+Tested using Thunder Client:
+
+- CRUD operations
+- Invalid input and JSON
+- Duplicate email addresses
+- Deleted customer retrieval
+- Unauthorized update fields
+
+Status: Customer API implementation and testing completed.
+
+---
 
 # Research Notes
 
-1. Middleware: Middleware functions run during the request-response cycle. Their order matters because each middleware runs in the order it is registered.
+- Middleware: Runs during the request-response cycle.
+- Error Handling: Express error middleware uses `err, req, res, next`.
+- Layered Architecture: Separates responsibilities for maintainability.
+- dotenv: Loads environment variables.
+- Zod: Provides schema-based validation.
+- Mass Assignment: Unrestricted field assignment can expose sensitive properties.
 
-2. Error Handling: Express recognizes error-handling middleware through its four parameters: err, req, res, and next. It should be placed after the routes.
+---
 
-3. app.js and server.js: The app.js file handles Express configuration, middleware, and routes, while server.js starts the server and listens on a port. Keeping them separate makes testing easier.
+# Project Progress
 
-4. dotenv: Dotenv loads variables from the .env file into process.env. We do not commit .env because it may contain secrets. Instead, we commit .env.example as a reference.
-
-### Bug Log
-
-Bug 1: Error Handler Position
-
-Symptom: The custom error handler did not catch route errors when placed before the routes.
- Cause: The error handler was registered before the routes.
- Fix: Moved the error handler below the routes.
- Lesson: Error-handling middleware should be placed after the routes.
-
-Bug 2: Missing .env File
-
- Symptom: The server started using the default port when the .env file was missing.
- Cause: A fallback port was configured in the application.
- Fix: Added a check for the missing PORT variable and a clear error message.
- Lesson: Required environment variables should be checked during startup.
-
-Bug 3: Async Route Error
-
- Symptom: Tested an error thrown inside an async route handler.
- Cause: Express 5 handles rejected promises from async route handlers automatically.
- Fix: Verified that the error reached the central error handler and returned the expected JSON response.
- Lesson: Understanding Express version behavior helps avoid unnecessary error-handling code.
-
-
+| Task | Status |
+|---|---|
+| Task 1 – Project Foundation | Completed |
+| Task 2 – Customer API | Completed |
+| Task 2 – API Testing | Completed |
+| README Documentation | Updated |
