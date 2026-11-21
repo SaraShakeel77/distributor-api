@@ -1,9 +1,9 @@
 
 const customerService = require("../services/customer.service");
 
-const createCustomer = (req, res, next) => {
+const createCustomer = async (req, res, next) => {
     try {
-        const customer = customerService.createCustomer(req.body);
+        const customer = await customerService.createCustomer(req.body);
 
         return res.status(201).json({
             success: true,
@@ -14,9 +14,9 @@ const createCustomer = (req, res, next) => {
     }
 };
 
-const getAllCustomers = (req, res, next) => {
+const getAllCustomers = async (req, res, next) => {
     try {
-        const customers = customerService.getAllCustomers();
+        const customers = await customerService.getAllCustomers();
 
         return res.status(200).json({
             success: true,
@@ -27,9 +27,9 @@ const getAllCustomers = (req, res, next) => {
     }
 };
 
-const getCustomerById = (req, res, next) => {
+const getCustomerById = async (req, res, next) => {
     try {
-        const customer = customerService.getCustomerById(req.params.id);
+        const customer = await customerService.getCustomerById(req.params.id);
 
         return res.status(200).json({
             success: true,
@@ -40,9 +40,9 @@ const getCustomerById = (req, res, next) => {
     }
 };
 
-const updateCustomer = (req, res, next) => {
+const updateCustomer = async (req, res, next) => {
     try {
-        const customer = customerService.updateCustomer(
+        const customer = await customerService.updateCustomer(
             req.params.id,
             req.body
         );
@@ -56,9 +56,9 @@ const updateCustomer = (req, res, next) => {
     }
 };
 
-const deleteCustomer = (req, res, next) => {
+const deleteCustomer = async (req, res, next) => {
     try {
-        customerService.deleteCustomer(req.params.id);
+        await customerService.deleteCustomer(req.params.id);
 
         return res.status(204).send();
     } catch (error) {

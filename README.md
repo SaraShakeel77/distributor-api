@@ -5,6 +5,7 @@ A RESTful API built with Node.js and Express.js for managing distributor operati
 ## Technologies
 
 - Node.js, Express.js, JavaScript
+- PostgreSQL, pg
 - dotenv, Nodemon
 - Zod, ESLint, Prettier
 
@@ -14,7 +15,8 @@ bash
 npm install
 
 
-Create a `.env` file using `.env.example`, then run:
+Create a .env file using .env.example, then run:
+
 bash
 npm run dev
 
@@ -78,23 +80,22 @@ Response:
 
 Implemented Customer CRUD operations using a layered architecture.
 
-- Routes and controllers
-- Service and repository layers
-- Zod request validation
-- Duplicate email prevention
-- Centralized error handling
+- Routes, controllers, services and repositories.
+- Zod request validation.
+- Duplicate email prevention.
+- Centralized error handling.
 
 ## API Endpoints
 
 Base URL: `http://localhost:5000/api/customers`
 
 | Method | Endpoint | Description |
-
-| POST | /api/customers | Create customer |
-| GET | /api/customers | Get all customers |
-| GET | /api/customers/:id | Get customer by ID |
-| PUT | /api/customers/:id | Update customer |
-| DELETE | /api/customers/:id | Delete customer |
+|---|---|---|
+| POST | `/api/customers` | Create customer |
+| GET | `/api/customers` | Get all customers |
+| GET | `/api/customers/:id` | Get customer by ID |
+| PUT | `/api/customers/:id` | Update customer |
+| DELETE | `/api/customers/:id` | Delete customer |
 
 ## Validation Rules
 
@@ -137,13 +138,77 @@ Base URL: `http://localhost:5000/api/customers`
 
 Tested using Thunder Client:
 
-- CRUD operations
-- Invalid input and JSON
-- Duplicate email addresses
-- Deleted customer retrieval
-- Unauthorized update fields
+- CRUD operations.
+- Invalid input and malformed JSON.
+- Duplicate email addresses.
+- Deleted customer retrieval.
+- Unauthorized update fields.
 
 Status: Customer API implementation and testing completed.
+
+---
+
+# Task 3 – PostgreSQL Persistence
+
+## Implementation
+
+- Integrated PostgreSQL using the `pg` package and connection pooling.
+- Configured database connection through environment variables.
+- Created the customers table.
+- Replaced in-memory storage with persistent database operations.
+- Implemented parameterized SQL queries.
+- Updated repository methods for CRUD operations.
+- Added database connection error handling.
+
+## Bug Log & Testing
+
+1. Database Connection Failure
+
+- Symptom: API requests failed when the database was unavailable.
+- Cause: Database connection was interrupted.
+- Fix: Verified connection failure handling and returned a clean error response.
+- Lesson: Handle database failures gracefully.
+
+2. SQL Injection
+
+- Symptom: SQL injection input could potentially affect database queries.
+- Cause: Unsafe query construction.
+- Fix: Used parameterized queries to store input as plain text.
+- Lesson: Never concatenate user input into SQL queries.
+
+3. Concurrent Duplicate Emails
+
+- Symptom: Simultaneous requests attempted to create customers with the same email.
+- Cause: Application-level duplicate checks alone cannot prevent race conditions.
+- Fix: Verified duplicate protection through the database unique constraint and error handling.
+- Lesson: Enforce data integrity at the database level.
+
+4. Missing Await
+
+- Symptom: Endpoint returned an error when fetching customers.
+- Cause: Repository query Promise was not awaited.
+- Fix: Restored `await` before `pool.query()`.
+- Lesson: Await asynchronous database operations before accessing their results.
+
+5. Response Field Mapping
+
+- Symptom: Database field names could appear as `created_at` and `updated_at` in API responses.
+- Cause: Database and API naming conventions differ.
+- Fix: Mapped snake_case database fields to camelCase API fields.
+- Lesson: Keep API responses consistent and readable.
+
+## Testing
+
+Verified using Thunder Client:
+
+- Database connection and CRUD operations.
+- Database failure handling.
+- SQL injection protection.
+- Concurrent duplicate email requests.
+- Asynchronous repository operations.
+- Response field naming.
+
+Status: PostgreSQL integration and bug testing completed.
 
 ---
 
@@ -154,6 +219,10 @@ Status: Customer API implementation and testing completed.
 - Layered Architecture: Separates responsibilities for maintainability.
 - dotenv: Loads environment variables.
 - Zod: Provides schema-based validation.
+- PostgreSQL: Relational database for persistent storage.
+- Parameterized Queries: Protect against SQL injection.
+- Connection Pooling: Efficiently manages database connections.
+- Unique Constraints: Enforce data integrity.
 - Mass Assignment: Unrestricted field assignment can expose sensitive properties.
 
 ---
@@ -161,8 +230,9 @@ Status: Customer API implementation and testing completed.
 # Project Progress
 
 | Task | Status |
-|---|---|
 | Task 1 – Project Foundation | Completed |
 | Task 2 – Customer API | Completed |
 | Task 2 – API Testing | Completed |
+| Task 3 – PostgreSQL Persistence | Completed |
+| Task 3 – Bug Testing | Completed |
 | README Documentation | Updated |

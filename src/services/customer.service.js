@@ -2,68 +2,93 @@
 const customerRepository = require("../repositories/customer.repository");
 const AppError = require("../Errors/AppError");
 
-// Create Customer
-const createCustomer = (customerData) => {
-    const email = customerData.email.toLowerCase();
-
-    const existingEmail = customerRepository.findByEmail(email);
-
-    if (existingEmail) {
-        throw new AppError("Email already exists", 409, "DUPLICATE_EMAIL");
+// Handle PostgreSQL duplicate email error
+const handleDatabaseError = (error) => {
+    if (error.code === "23505") {
+        throw new AppError(
+            "Email already exists",
+            409,
+            "DUPLICATE_EMAIL"
+        );
     }
 
+    throw error;
+};
+
+// Create Customer
+const createCustomer = async (customerData) => {
     const customer = {
-        id: require("crypto").randomUUID(),
         ...customerData,
-        email,
-        status: customerData.status || "ACTIVE",
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        email: customerData.email.toLowerCase(),
     };
 
-    return customerRepository.create(customer);
+    try {
+        return await customerRepository.create(customer);
+    } catch (error) {
+        handleDatabaseError(error);
+    }
 };
 
 // Get All Customers
-const getAllCustomers = () => {
-    return customerRepository.findAll();
+const getAllCustomers = async () => {
+    return await customerRepository.findAll();
 };
+
 // Get Customer By ID
-const getCustomerById = (id) => {
-    const customer = customerRepository.findById(id);
+const getCustomerById = async (id) => {
+    const customer = await customerRepository.findById(id);
 
     if (!customer) {
-        throw new AppError("Customer not found", 404, "CUSTOMER_NOT_FOUND");
+        throw new AppError(
+            "Customer not found",
+            404,
+            "CUSTOMER_NOT_FOUND"
+        );
     }
 
     return customer;
 };
 
 // Update Customer
-const updateCustomer = (id, updatedData) => {
-    const existingCustomer = customerRepository.findById(id);
+const updateCustomer = async (id, updatedData) => {
+    const existingCustomer = await customerRepository.findById(id);
 
     if (!existingCustomer) {
-        throw new AppError("Customer not found", 404, "CUSTOMER_NOT_FOUND");
+        throw new AppError(
+            "Customer not found",
+            404,
+            "CUSTOMER_NOT_FOUND"
+        );
     }
 
-    const customer = customerRepository.update(id, {
+    const customerData = {
         ...updatedData,
-        updatedAt: new Date().toISOString(),
-    });
+    };
 
-    return customer;
+    if (customerData.email) {
+        customerData.email = customerData.email.toLowerCase();
+    }
+
+    try {
+        return await customerRepository.update(id, customerData);
+    } catch (error) {
+        handleDatabaseError(error);
+    }
 };
 
 // Delete Customer
-const deleteCustomer = (id) => {
-    const existingCustomer = customerRepository.findById(id);
+const deleteCustomer = async (id) => {
+    const existingCustomer = await customerRepository.findById(id);
 
     if (!existingCustomer) {
-        throw new AppError("Customer not found", 404, "CUSTOMER_NOT_FOUND");
+        throw new AppError(
+            "Customer not found",
+            404,
+            "CUSTOMER_NOT_FOUND"
+        );
     }
 
-    customerRepository.remove(id);
+    return await customerRepository.remove(id);
 };
 
 module.exports = {
@@ -73,4 +98,3 @@ module.exports = {
     updateCustomer,
     deleteCustomer,
 };
-
