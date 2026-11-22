@@ -227,12 +227,78 @@ Status: PostgreSQL integration and bug testing completed.
 
 ---
 
-# Project Progress
+# Task 4 – Inventory & API Improvements
+
+## Implementation
+
+- Updated schema.sql and seed.sql.
+- Implemented warehouse-level inventory endpoint.
+- Added pagination and category filtering.
+- Improved validation and error handling.
+- Standardized price formatting.
+
+## API Endpoints
+
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/api/products` | Get products with filters and pagination |
+| GET | `/api/products/:id/inventory` | Get warehouse inventory |
+
+## Bug Log
+
+1. Invalid Pagination
+- Symptom: Invalid page and limit values.
+- Cause: Missing validation.
+- Fix: Added pagination validation and maximum limit.
+- Lesson: Validate query parameters.
+
+2. Non-existing Category
+- Symptom: No matching products.
+- Cause: Category does not exist.
+- Fix: Return an empty list (200 OK).
+- Lesson: Empty results are not errors.
+
+3. Invalid Inventory Product ID
+- Symptom: Invalid product reference.
+- Cause: Product does not exist.
+- Fix: Added foreign key constraint.
+- Lesson: Maintain referential integrity.
+
+4. Inconsistent Price Formatting
+- Symptom: Different price formats.
+- Cause: Inconsistent response formatting.
+- Fix: Standardized price formatting.
+- Lesson: Keep API responses consistent.
+
+5. Empty Category Filter
+- Symptom: Empty category caused unexpected filtering.
+- Cause: Missing empty-value handling.
+- Fix: Normalize empty values and skip filtering.
+- Lesson: Handle optional parameters.
+
+## Testing
+
+- Pagination and category filtering.
+- Invalid inventory references.
+- Price formatting.
+- Empty category values.
+- Warehouse inventory and 404 handling.
+
+Status: Completed.
+
+## Research Notes
+
+- Pagination: Divides records into pages.
+- Filtering: Retrieves matching records.
+- Foreign Key: Maintains table relationships.
+- Referential Integrity: Prevents invalid references.
+- Price Formatting: Ensures consistent API responses.
+
+## Project Progress
 
 | Task | Status |
+|---|---|
 | Task 1 – Project Foundation | Completed |
 | Task 2 – Customer API | Completed |
-| Task 2 – API Testing | Completed |
 | Task 3 – PostgreSQL Persistence | Completed |
-| Task 3 – Bug Testing | Completed |
-| README Documentation | Updated |
+| Task 4 – Inventory & API Improvements | Completed |

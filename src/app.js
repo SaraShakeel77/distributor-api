@@ -4,6 +4,7 @@ const app = express();
 
 const healthRoutes = require("./routes/health.routes");
 const customerRoutes = require("./routes/customer.routes");
+const productRoutes = require("./routes/product.routes");
 
 const requestLogger = require("./middleware/requestLogger");
 const notfound = require("./middleware/notfound");
@@ -14,6 +15,7 @@ app.use(requestLogger);
 
 app.use(healthRoutes);
 app.use("/api/customers", customerRoutes);
+app.use("/api/products", productRoutes);
 
 app.use(notfound);
 app.use(errorHandler);

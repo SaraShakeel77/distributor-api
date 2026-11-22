@@ -1,7 +1,11 @@
 
 const errorHandler = (err, req, res, next) => {
     // Log actual error for debugging
-    console.error("API Error:", err.stack || err.message);
+    console.log("ACTUAL ERROR:", err);
+    console.log("ERROR MESSAGE:", err.message);
+    console.log("ERROR CODE:", err.code);
+    console.log("ERROR STACK:", err.stack);
+
 
     // Handle known application errors
     if (err.statusCode) {
