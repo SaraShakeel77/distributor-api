@@ -22,23 +22,54 @@ const getProductById = async (id) => {
     return product;
 };
 
-// Get product inventory by ID
+// Get product inventory
 const getProductInventory = async (id) => {
+    await getProductById(id);
+
     const inventory = await productRepository.findInventoryByProductId(id);
 
-    if (inventory.length === 0) {
+    return inventory;
+};
+
+// Create product
+const createProduct = async (productData) => {
+    return await productRepository.create(productData);
+};
+
+// Update product
+const updateProduct = async (id, productData) => {
+    await getProductById(id);
+
+    const updatedProduct = await productRepository.update(id, productData);
+
+    return updatedProduct;
+};
+
+// Update product inventory
+const updateProductInventory = async (id, inventoryData) => {
+    await getProductById(id);
+
+    const updatedInventory = await productRepository.updateInventory(
+        id,
+        inventoryData
+    );
+
+    if (!updatedInventory) {
         throw new AppError(
-            "Product inventory not found",
+            "Product inventory not found for this warehouse",
             404,
             "INVENTORY_NOT_FOUND"
         );
     }
 
-    return inventory;
+    return updatedInventory;
 };
 
 module.exports = {
     getAllProducts,
     getProductById,
     getProductInventory,
+    createProduct,
+    updateProduct,
+    updateProductInventory
 };
